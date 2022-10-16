@@ -1,0 +1,3 @@
+#Ignoro tutti i file nel modules
+**/node_modules
+
