@@ -1,0 +1,14 @@
+h1 {
+    color: blue;
+}
+
+img {
+    width: 200px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    font-size: 50px;
+    color: brown;
+}
