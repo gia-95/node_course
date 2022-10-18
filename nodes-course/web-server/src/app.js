@@ -1,6 +1,7 @@
 const express = require ('express')
 const path = require('path')
 const hbs = require ('hbs')
+const forecast = require('./utils/forecast')
 
 //#######################################################################################################
 
@@ -41,6 +42,30 @@ app.get('/about', (req, res) => {
         title: 'About page',
         name: "Gianluca"
     })
+})
+
+
+app.get('/weather', (req, res) => {
+
+    if (!req.query.address) {
+        return res.send('Address not specificated.')
+    }
+
+    const add = req.query.address
+
+    forecast(add, (error, data) => {
+        if (error){
+            return res.send({error})
+        }
+
+        res.send({
+            location: add,
+            forecast: data.weather_descriptions[0],
+            temperature: data.temperature,
+        })
+    })
+
+
 })
 
 //####### Pagine errori #########
