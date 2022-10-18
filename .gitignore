@@ -1,3 +1,4 @@
 #Ignoro tutti i file nel modules
 **/node_modules
 
+.DS_Store
