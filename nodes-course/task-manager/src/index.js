@@ -1,62 +1,29 @@
 const express = require ('express')
 const User = require('./model/user')
-const Task = require('./model/task')
 require('./db/mongoose') //To start de connection to db
+const taskRouter = require('./routers/task')
+const userRouter = require('./routers/user')
 
 
 //#####################  Configurazioni  #####################
 const app = express()
 app.use(express.json())
+app.use(taskRouter)
+app.use(userRouter)
 
 
-//#####################  End-point  #####################
-app.post('/user', (req, res) => {
-    const user = new User(req.body)
-
-    user.save().then(() => {
-        res.status(201).send(user)
-    }).catch((e) => {
-        console.log(e)
-        res.status(400).send(e)
-    })
-})
-
-app.post('/tasks', (req, res) => {
-    const task = new Task(req.body)
-
-    task.save().then(() => {
-        res.status(201).send(task)
-    }).catch((e) => {
-        res.status(400).send(e)
-    })
-})
+const jwt = require('jsonwebtoken')
 
 
+const myFunction = () => {
+    const token = jwt.sign({ _id: 'abc123' }, 'chiavesegreta', { expiresIn: '1 day'})
+    console.log(token)
 
-app.get('/tasks', (req, res) => {
-    Task.find({}).then((tasks) => {
-        res.send(tasks)
-    }).catch((e) => {
-        res.status(500)
-    })
-})
+    const data = jwt.verify(token, 'chiavesegreta')
+    console.log(data)
+}
 
-app.get('/tasks/:id', (req, res) => {
-    const _id = req.params.id
-
-    Task.findById(_id).then((task) => {
-        if (!task) {
-            return res.status(400).send('Nessun task trovato.')
-        }
-        
-        res.send(task)
-    }).catch((e) => {
-        res.status(500)
-    })
-})
-
-
-
+myFunction()
 
 
 app.listen(3000, () => {
