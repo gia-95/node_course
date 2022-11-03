@@ -21,10 +21,38 @@ router.post('/tasks', auth, async (req, res) => {
 })
 
 
+// GET /tasks?completed=(true or false or nothing)
+// GET /tasks?limit=10&skip=10 (10 per pagina, parti dal 10 (seconda pagina))
+// Get /tasks?orderBy=createdAt:asc   oppure /tasks/orderBy=completed:desc
 router.get('/tasks', auth, async (req, res) => {
     try {
         // const tasks = await Task.find({ owner: req.user._id})
-        await req.user.populate('tasks').execPopulate()  //Faccio la stessa cosa di sopra, solo he popolo i task dello user che sta nella request
+        // await req.user.populate('tasks').execPopulate()  //Faccio la stessa cosa di sopra, solo he popolo i task dello user che sta nella request
+        
+        //Qua un'altra cosa ancora (con il parametro)
+
+        const match = {}
+        const sort = {}
+
+        if (req.query.completed) { //Se nella query lho specificato prende il valore (come stringa), senno undefined
+            match.completed = req.query.completed === 'true'   //perche lo devo far diventare un booleano
+        }
+
+        if (req.query.orderBy) {
+            const parts = req.query.orderBy.split(':')
+            sort[parts[0]] = parts[1] === 'desc' ? 1 : -1 //Se parts[1] = desc allora 1 sennò -1 (sarebbe ordine cres o decres)
+        }
+
+        await req.user.populate({
+            path: 'tasks',
+            match: match,  //'match' deve essere un ogetto con le propietà su cui voglio filtrare
+            options: {
+                limit: parseInt(req.query.limit),
+                skip: parseInt(req.query.skip),
+                sort
+            }
+        }).execPopulate()
+        
         res.send(req.user.tasks)
     } catch(e) {
         res.status(400).send(e)
