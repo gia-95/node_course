@@ -2,6 +2,22 @@ const express = require('express')
 const router = new express.Router()
 const User = require('../models/user')
 const auth = require('../middleware/auth')
+const multer = require('multer')
+const sharp = require('sharp')
+//#################### Config MULTER (per scambio file/images) ###########################################
+const upload = multer({
+    limits: {
+        fileSize: 1000000 //Byte
+    },
+    fileFilter (req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|png|jpeg)$/)) {   //Espressione regolare*
+            return cb(new Error('Formato file non valido!'))
+        }   
+
+        cb(undefined, true)
+    }
+})
+//###############################################################
 
 router.post('/users', async (req, res) => {
     const user = new User(req.body)
@@ -89,6 +105,40 @@ router.delete('/users/me', auth, async (req, res) => {
     }
 })
 
+
+router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
+    //Prima con il pacchetto Sharp, ridimensiono e cast a png l'immagine nel payload di richiesta
+    const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
+    req.user.avatar = buffer
+    await req.user.save()
+    res.send()
+}, (error, req, res, next) => { //Questo è l'handler per gli errori; se viene generato un errore, 
+    res.status(400).send({ error: error.message})    // (in questo caso la filter di 'upload' genera errrore se il formato non è valido)
+})                                                   // cattura l'errore e chiama quella callback li
+
+
+router.delete('/users/me/avatar', auth, async (req, res) => {
+    req.user.avatar = undefined
+    await req.user.save()
+    res.send('Avatar utente eliminato correttamente!')
+}, (error, req, res, next) => {
+    res.status(400).sned({ error: error.message })
+})
+
+router.get('/users/:id/avatar', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+
+        if (!user || !user.avatar) {
+            throw new Error('User o avatar non trovato')
+        }
+
+        res.set('Content-Type', 'image/png')   // imposti nell'Header il fatto che il contenuto è un'immagine
+        res.send(user.avatar)
+    } catch (e) {
+        res.status(404).send({ error: error.message })
+    }
+})
 
 
 
