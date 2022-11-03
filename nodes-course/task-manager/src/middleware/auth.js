@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const auth = async (req, res, next ) => {
     try{
         const token = req.header('Authorization').replace('Bearer ', '')
-        const decode = jwt.verify(token, 'chiavesegreta')
+        const decode = jwt.verify(token, process.env.JWT_SECRET)
 
         const user = await User.findOne({ _id: decode._id, 'tokens.token': token })  //Verifico sia che esiste un utente con quell'ID
                                                                                   // sia che il token sta nella lista dei token dell'utente

@@ -1,6 +1,8 @@
 const mongoose  = require ('mongoose')
 
+const mongodb_url = process.env.MONGODB_URL
+
 //Setup connection to the database
-mongoose.connect('mongodb://127.0.0.1/tasks-manager-api', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(mongodb_url, { useNewUrlParser: true, useUnifiedTopology: true })
 
 

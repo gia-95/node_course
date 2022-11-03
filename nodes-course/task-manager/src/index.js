@@ -4,6 +4,7 @@ const taskRouter = require('./routers/task')
 const userRouter = require('./routers/user')
 
 const app = express()
+const port = process.env.PORT
 
 //###################### Middleware ###########################
 
@@ -17,8 +18,8 @@ app.use(userRouter)
 
 
 
-app.listen(3000, () => {
-    console.log('Server is up on port 3000.')
+app.listen(port, () => {
+    console.log('Server is up on port ' + port)
 })
 
 
