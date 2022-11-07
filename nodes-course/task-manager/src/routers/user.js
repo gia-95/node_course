@@ -31,7 +31,7 @@ router.post('/users', async (req, res) => {
         const token = await user.generateAuthToken()
         res.status(201).send({ user, token })
     } catch (e) {
-        res.status(500).send(e)
+        res.status(500).send({ error: e })
     }
 })
 
@@ -105,7 +105,7 @@ router.delete('/users/me', auth, async (req, res) => {
         sendGoodByEmail(req.user.email, req.user.name)
         res.send(req.user)
     } catch (e) {
-        res.status(400).send({ error: e})
+        res.status(500).send({ error: e})
     }
 })
 
