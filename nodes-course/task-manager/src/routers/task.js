@@ -16,8 +16,6 @@ router.post('/tasks', auth, async (req, res) => {
         owner: req.user._id
     })
 
-    console.log(task)
-
     try {
         await task.save()  //Che è come fare task.save().then...
         res.status(201).send(task) //QUESTO CODICE VIENE ESEGUITO SOLO SE LA AWAIT VA A BUON FINE (e ovvimante dopo che viene eseguita)
